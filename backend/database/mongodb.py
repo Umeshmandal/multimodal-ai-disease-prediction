@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     HF_MODEL: str = "mistralai/Mistral-7B-Instruct-v0.2"
 
     class Config:
-        env_file = Path(__file__).resolve().parent.parent / ".env"
+        env_file = Path(__file__).resolve().parents[2] / ".env"
         extra = "ignore"
 
 

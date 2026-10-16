@@ -7,7 +7,7 @@ class PromptBuilder:
     """Build constrained, evidence-labelled report prompts."""
 
     MEDICAL_DISCLAIMER = (
-        "RESEARCH PROTOTYPE ONLY. NOT FOR CLINICAL DIAGNOSIS. This AI-generated "
+        "Research prototype only. Not for clinical diagnosis. This AI-generated "
         "text is not medical advice and must be reviewed by a licensed clinician."
     )
 

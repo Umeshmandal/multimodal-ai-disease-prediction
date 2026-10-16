@@ -50,8 +50,14 @@ class HistoryInferencePipeline:
         Convert raw dictionary data into a normalized 1D numpy array.
         TODO: Replace this mock logic with your actual sklearn Pipeline/StandardScaler transformations.
         """
-        # 1. Age (normalized)
-        age = (patient_data.get("age", 50) - 50.0) / 15.0 
+        def numeric(value: Any, default: float) -> float:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        # Browser form values arrive as strings; normalize them before encoding.
+        age = (numeric(patient_data.get("age"), 50.0) - 50.0) / 15.0
         
         # 2. Gender (one-hot: [is_male, is_female])
         gender = patient_data.get("gender", "other").lower()
@@ -60,11 +66,11 @@ class HistoryInferencePipeline:
         
         # 3. Vitals (normalized mock values: HR, BP_sys, BP_dia, Temp, SpO2)
         vitals = patient_data.get("vitals", {})
-        hr = (vitals.get("heart_rate", 80) - 80.0) / 15.0
-        bp_sys = (vitals.get("systolic_bp", 120) - 120.0) / 15.0
-        bp_dia = (vitals.get("diastolic_bp", 80) - 80.0) / 10.0
-        temp = (vitals.get("temperature", 98.6) - 98.6) / 1.0
-        spo2 = (vitals.get("spo2", 98.0) - 98.0) / 2.0
+        hr = (numeric(vitals.get("heart_rate"), 80.0) - 80.0) / 15.0
+        bp_sys = (numeric(vitals.get("systolic_bp"), 120.0) - 120.0) / 15.0
+        bp_dia = (numeric(vitals.get("diastolic_bp"), 80.0) - 80.0) / 10.0
+        temp = (numeric(vitals.get("temperature"), 98.6) - 98.6) / 1.0
+        spo2 = (numeric(vitals.get("spo2"), 98.0) - 98.0) / 2.0
         
         # 4. Prior Conditions (multi-hot binary vector of length 14, matching disease taxonomy)
         conditions = patient_data.get("prior_conditions", [])
@@ -95,6 +101,21 @@ class HistoryInferencePipeline:
             embeddings = outputs["embeddings"]
             
         return embeddings.squeeze(0).cpu()
+
+    def predict(self, patient_data: Dict[str, Any]) -> Tuple[Dict[str, float], torch.Tensor]:
+        """Return auxiliary history probabilities and the history embedding."""
+        features_np = self.preprocess_features(patient_data)
+        features_tensor = torch.tensor(features_np, dtype=torch.float32).unsqueeze(0).to(self.device)
+        with torch.no_grad():
+            outputs = self.model(features_tensor)
+            probabilities = torch.sigmoid(outputs["logits"]).squeeze(0).cpu().numpy()
+            embedding = outputs["embeddings"].squeeze(0).cpu()
+        class_names = [
+            "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass",
+            "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema",
+            "Emphysema", "Fibrosis", "Pleural_Thickening", "Hernia",
+        ]
+        return {name: float(value) for name, value in zip(class_names, probabilities)}, embedding
 
 # Global instance
 history_inference = HistoryInferencePipeline()

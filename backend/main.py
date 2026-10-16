@@ -52,8 +52,8 @@ async def lifespan(app: FastAPI):
 def create_app() -> FastAPI:
     """Application factory."""
     application = FastAPI(
-        title="Multimodal Healthcare AI API",
-        description="API for Multimodal AI-Based Intelligent Healthcare System. ⚠️ FOR RESEARCH AND DECISION SUPPORT ONLY. NOT FOR CLINICAL DIAGNOSIS.",
+        title="Multimodal AI Disease Prediction API",
+        description="API for the Multimodal AI Disease Prediction project. For research and decision support only. Not for clinical diagnosis.",
         version="1.0.0",
         docs_url="/api/docs",
         redoc_url="/api/redoc",

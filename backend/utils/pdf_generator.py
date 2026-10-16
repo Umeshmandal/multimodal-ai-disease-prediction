@@ -48,9 +48,9 @@ def generate_pdf_report(prediction_data: dict, rag_context: list, llm_report: st
     styles.add(ParagraphStyle(name="BodySmall", parent=styles["BodyText"], fontName="Helvetica", fontSize=9.5, leading=13, textColor=colors.HexColor("#1e293b")))
     styles.add(ParagraphStyle(name="Muted", parent=styles["BodyText"], fontName="Helvetica", fontSize=8.5, leading=11, textColor=MUTED))
 
-    document = SimpleDocTemplate(str(output_path), pagesize=A4, rightMargin=18 * mm, leftMargin=18 * mm, topMargin=18 * mm, bottomMargin=20 * mm, title="Multimodal Healthcare AI - Clinical Analysis Report")
+    document = SimpleDocTemplate(str(output_path), pagesize=A4, rightMargin=18 * mm, leftMargin=18 * mm, topMargin=18 * mm, bottomMargin=20 * mm, title="Multimodal AI Disease Prediction - Clinical Analysis Report")
     story = []
-    header = Table([[Paragraph("Multimodal Healthcare AI - Clinical Analysis Report", styles["ReportTitle"])]], colWidths=[174 * mm])
+    header = Table([[Paragraph("Multimodal AI Disease Prediction - Clinical Analysis Report", styles["ReportTitle"])]], colWidths=[174 * mm])
     header.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), NAVY), ("LEFTPADDING", (0, 0), (-1, -1), 10), ("RIGHTPADDING", (0, 0), (-1, -1), 10), ("TOPPADDING", (0, 0), (-1, -1), 12), ("BOTTOMPADDING", (0, 0), (-1, -1), 12)]))
     story.extend([header, Spacer(1, 8)])
 

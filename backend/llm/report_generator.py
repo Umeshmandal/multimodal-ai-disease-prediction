@@ -32,7 +32,9 @@ class ReportGenerator:
         )
 
         try:
-            if self.provider == "openai":
+            if self.provider == "mock":
+                report_text = self._call_mock(system_prompt, user_prompt)
+            elif self.provider == "openai":
                 report_text = await self._call_openai(system_prompt, user_prompt)
             elif self.provider == "anthropic":
                 report_text = await self._call_anthropic(system_prompt, user_prompt)
@@ -43,7 +45,7 @@ class ReportGenerator:
             else:
                 raise RuntimeError(
                     "No real LLM provider is configured. Set LLM_PROVIDER=ollama and "
-                    "OLLAMA_BASE_URL in backend/.env."
+                    "OLLAMA_BASE_URL in backend/.env, or use LLM_PROVIDER=mock for local test mode."
                 )
         except Exception as error:
             logger.exception("LLM report generation failed")
@@ -60,6 +62,17 @@ class ReportGenerator:
             "retrieved_references": list(dict.fromkeys(references)),
             "disclaimer": PromptBuilder.MEDICAL_DISCLAIMER,
         }
+
+    def _call_mock(self, system_prompt: str, user_prompt: str) -> str:
+        """Local development fallback used by the project smoke tests and offline workflows."""
+        logger.warning("Using mock LLM provider for local development; no external API call is being made.")
+        disease_summary = "Pneumonia and effusion are the primary concern based on the supplied multimodal findings."
+        return (
+            "Clinical report (mock mode)\n\n"
+            f"System guidance: {system_prompt[:180]}\n\n"
+            f"Clinical summary: {disease_summary}\n"
+            "Recommended next steps: repeat imaging review, confirm vitals, and escalate to a licensed clinician for final diagnosis and treatment decisions."
+        )
 
     async def _call_openai(self, system_prompt: str, user_prompt: str) -> str:
         """Use the official OpenAI Responses API; do not retain report content."""

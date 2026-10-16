@@ -1,77 +1,10 @@
 import React, { useState } from 'react';
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  Paper,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Activity, Brain, FileCheck2, ShieldCheck } from 'lucide-react';
 import { authService } from '../services/api';
 
 function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      await authService.login(username, password);
-      onLogin();
-    } catch (err) {
-      setError(err.message || 'Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Container maxWidth="sm" sx={{ mt: 8 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Healthcare AI Login
-        </Typography>
-        <Typography color="text.secondary" sx={{ mb: 3 }}>
-          Sign in to access the clinical decision-support tools.
-        </Typography>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        <Box component="form" onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            required
-            label="Username"
-            margin="normal"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-          />
-          <TextField
-            fullWidth
-            required
-            label="Password"
-            type="password"
-            margin="normal"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-          <Button
-            fullWidth
-            type="submit"
-            variant="contained"
-            disabled={loading}
-            sx={{ mt: 3 }}
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
-  );
+  const [username, setUsername] = useState(''); const [password, setPassword] = useState(''); const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
+  const submit = async (event) => { event.preventDefault(); setError(''); setLoading(true); try { await authService.login(username, password); onLogin(); } catch (err) { setError(err.message); } finally { setLoading(false); } };
+  return <div className="login-page"><section className="login-visual"><div><div className="brand"><span className="brand-mark"><Activity size={17} /></span><div><strong>MULTIMODAL AI</strong><small>Disease Prediction Project</small></div></div><div style={{ marginTop: '20vh' }}><h1>Intelligent analysis.<br />Better decisions.</h1><p>Multimodal disease prediction with explainable AI, LLM, and RAG.</p></div></div><div className="login-features"><div className="login-feature"><span><Brain size={14} /></span> Image-based prediction</div><div className="login-feature"><span><Activity size={14} /></span> Multimodal analysis</div><div className="login-feature"><span><ShieldCheck size={14} /></span> Explainable AI</div><div className="login-feature"><span><FileCheck2 size={14} /></span> LLM + RAG reports</div></div></section><section className="login-card"><p className="eyebrow">MULTIMODAL AI DISEASE PREDICTION</p><h2>Welcome back</h2><p>Sign in to your project workspace.</p>{error && <div className="login-error">{error}</div>}<form onSubmit={submit}><div className="field"><label>Username</label><input required value={username} onChange={e => setUsername(e.target.value)} placeholder="admin" /></div><div className="field"><label>Password</label><input required type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" /></div><label style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#71859b' }}><span><input type="checkbox" /> Remember me</span><a href="#forgot" style={{ color: '#1675df' }}>Forgot password?</a></label><button className="primary-button" type="submit" disabled={loading}>{loading ? 'Signing in...' : 'Sign in'}</button></form></section></div>;
 }
-
 export default Login;

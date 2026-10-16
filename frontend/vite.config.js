@@ -6,6 +6,12 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true, // Prevents Vite from silently moving to 5174
-    host: true
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
   }
 })

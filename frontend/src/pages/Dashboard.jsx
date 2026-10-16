@@ -1,103 +1,29 @@
-// frontend/src/pages/Dashboard.jsx
 import React from 'react';
-import {
-  Box, AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, CardActions
-} from '@mui/material';
+import { Activity, AlertTriangle, ClipboardList, FileText, Plus, ShieldCheck, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Assessment, Upload, Description } from '@mui/icons-material';
 
-function Dashboard({ onLogout }) {
+const activity = [
+  ['P-1042', 'Patient registered · High risk (72%)', '2 hours ago', AlertTriangle],
+  ['P-1041', 'Report generated', '4 hours ago', FileText],
+  ['P-1040', 'New analysis started', '5 hours ago', Activity],
+  ['P-1039', 'Analysis completed · Low risk (18%)', '7 hours ago', ShieldCheck],
+];
+
+function Dashboard() {
   const navigate = useNavigate();
-
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            🏥 Multimodal Healthcare AI
-          </Typography>
-          <Button color="inherit" onClick={onLogout}>Logout</Button>
-        </Toolbar>
-      </AppBar>
-
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          Welcome to the AI Healthcare System
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary" paragraph>
-          Advanced multimodal disease prediction using Vision Transformers, Clinical BERT, and Explainable AI
-        </Typography>
-
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Upload sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  New Prediction
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Upload medical images (MRI/X-Ray), enter symptoms, and get AI-powered disease predictions with explainability.
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button 
-                  size="large" 
-                  variant="contained" 
-                  onClick={() => navigate('/prediction')}
-                >
-                  Start Analysis
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Assessment sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  View Reports
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Access previously generated clinical reports with AI explanations and retrieved medical references.
-                </Typography>
-              </CardContent>
-              <CardActions>
-                <Button size="large" variant="outlined" disabled>
-                  Coming Soon
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent>
-                <Description sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  System Status
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Backend: Connected<br/>
-                  Models: Loaded<br/>
-                  RAG: Ready
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        <Box sx={{ mt: 4, p: 2, bgcolor: 'warning.light', borderRadius: 1 }}>
-          <Typography variant="body2" align="center">
-            <strong>⚠️ MEDICAL DISCLAIMER:</strong> This system is a research prototype for clinical decision support ONLY. 
-            It is NOT a substitute for professional medical advice, diagnosis, or treatment. 
-            All predictions must be verified by licensed healthcare professionals.
-          </Typography>
-        </Box>
-      </Container>
-    </Box>
-  );
+  return <main className="page-content">
+    <div className="page-heading"><div><p className="eyebrow">TUESDAY, APRIL 26, 2025</p><h1>Welcome back</h1><p className="muted">Here is your project overview for today.</p></div><button className="primary-button" onClick={() => navigate('/prediction')}><Plus size={14} /> New analysis</button></div>
+    <section className="kpi-grid">
+      <div className="panel kpi-card"><div className="kpi-label"><span className="kpi-icon"><ClipboardList size={14} /></span> Total patients</div><div className="kpi-value">48</div><span className="trend">↗ 12% from last month</span></div>
+      <div className="panel kpi-card"><div className="kpi-label"><span className="kpi-icon" style={{ color: '#14a579', background: '#e6f8f1' }}><Activity size={14} /></span> Predictions made</div><div className="kpi-value">42</div><span className="trend">↗ 8% from last month</span></div>
+      <div className="panel kpi-card"><div className="kpi-label"><span className="kpi-icon" style={{ color: '#ed5e65', background: '#fff0f1' }}><AlertTriangle size={14} /></span> High risk cases</div><div className="kpi-value">7</div><span className="trend" style={{ color: '#ed5e65' }}>↗ 2 from last month</span></div>
+      <div className="panel kpi-card"><div className="kpi-label"><span className="kpi-icon" style={{ color: '#8065e8', background: '#f0edff' }}><FileText size={14} /></span> Reports generated</div><div className="kpi-value">38</div><span className="trend">↗ 5% from last month</span></div>
+    </section>
+    <section className="dashboard-grid">
+      <div className="panel"><div className="panel-header"><div><div className="panel-title">Recent activity</div><div className="panel-sub">Latest updates from your workspace</div></div><button className="icon-button">•••</button></div><div className="activity-list">{activity.map(([id, text, time, Icon]) => <div className="activity-row" key={id}><span className="activity-badge"><Icon size={13} /></span><div><strong>Patient {id}</strong><small>{text}</small></div><span className="time">{time}</span></div>)}</div></div>
+      <div className="panel"><div className="panel-header"><div><div className="panel-title">Prediction overview</div><div className="panel-sub">Risk distribution over the last 7 days</div></div><TrendingUp size={15} color="#1a7de6" /></div><div className="chart"><div className="bar" style={{ height: '42%' }} data-day="Mon" /><div className="bar green" style={{ height: '61%' }} data-day="Tue" /><div className="bar" style={{ height: '50%' }} data-day="Wed" /><div className="bar green" style={{ height: '74%' }} data-day="Thu" /><div className="bar" style={{ height: '58%' }} data-day="Fri" /><div className="bar green" style={{ height: '83%' }} data-day="Sat" /><div className="bar" style={{ height: '66%' }} data-day="Sun" /></div><div className="legend"><span><i />Low risk</span><span><i className="green" />Medium risk</span><span><i className="red" />High risk</span></div></div>
+    </section>
+    <section className="panel" style={{ marginTop: 12 }}><div className="panel-header"><div><div className="panel-title">Common diseases detected</div><div className="panel-sub">Across all completed predictions</div></div></div><div className="kpi-grid" style={{ padding: '6px 16px 18px', gridTemplateColumns: 'repeat(4, 1fr)' }}><div><div className="kpi-label">Brain tumor</div><div className="kpi-value" style={{ fontSize: 17 }}>18%</div></div><div><div className="kpi-label">Pneumonia</div><div className="kpi-value" style={{ fontSize: 17 }}>14%</div></div><div><div className="kpi-label">Brain stroke</div><div className="kpi-value" style={{ fontSize: 17 }}>12%</div></div><div><div className="kpi-label">Heart disease</div><div className="kpi-value" style={{ fontSize: 17 }}>10%</div></div></div></section>
+  </main>;
 }
-
 export default Dashboard;

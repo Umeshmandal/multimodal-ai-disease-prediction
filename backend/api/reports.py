@@ -1,5 +1,7 @@
 # backend/api/reports.py
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import FileResponse
+from typing import List
 from bson import ObjectId
 
 from database.mongodb import db
@@ -7,8 +9,33 @@ from database.schemas import ReportRequest, ReportResponse, ReportDB
 from rag.retriever import medical_retriever
 from llm.report_generator import report_generator
 from api.auth import get_current_user
+from utils.pdf_generator import generate_pdf_report
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
+
+@router.get("/", response_model=List[ReportDB])
+async def list_reports(skip: int = 0, limit: int = 20, current_user: dict = Depends(get_current_user)):
+    """List generated reports for the reports workspace."""
+    reports = await db.db.reports.find().sort("_id", -1).skip(skip).limit(limit).to_list(limit)
+    for report in reports:
+        report["_id"] = str(report["_id"])
+    return [ReportDB(**report) for report in reports]
+
+@router.get("/{report_id}/pdf")
+async def download_report_pdf(report_id: str, current_user: dict = Depends(get_current_user)):
+    """Generate and download a PDF for a stored report."""
+    if not ObjectId.is_valid(report_id):
+        raise HTTPException(status_code=400, detail="Invalid report ID format")
+    report = await db.db.reports.find_one({"_id": ObjectId(report_id)})
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    pdf_path = generate_pdf_report(
+        prediction_data={"symptoms": "Not provided", "top_predictions": []},
+        rag_context=[{"metadata": {"source": reference}, "text": ""} for reference in report.get("retrieved_references", [])],
+        llm_report=report.get("generated_report", ""),
+        grad_cam_path=None,
+    )
+    return FileResponse(pdf_path, media_type="application/pdf", filename=f"clinical_report_{report_id}.pdf")
 
 @router.post("/generate", response_model=ReportResponse)
 async def generate_clinical_report(

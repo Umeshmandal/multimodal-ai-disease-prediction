@@ -55,8 +55,8 @@ class PredictionDB(BaseModel):
 class ReportDB(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: str = Field(alias="_id")
-    patient_id: str
-    prediction_id: str
+    patient_id: Optional[str] = None
+    prediction_id: Optional[str] = None
     generated_report: str
     retrieved_references: List[str]
     disclaimer: str = "DISCLAIMER: This is an AI-generated decision support report. It is not a substitute for professional medical advice, diagnosis, or treatment."
@@ -111,16 +111,17 @@ class PredictionResponse(BaseModel):
     patient_id: Optional[str] = None
     image_prediction: Dict[str, float]
     text_prediction: Dict[str, float]
+    history_prediction: Dict[str, float] = {}
     fused_prediction: Dict[str, float]
     final_diseases: List[str]
     confidence_score: float
     explainability: ExplainabilityResponse
-    disclaimer: str = "DISCLAIMER: AI decision support prototype. Not for clinical diagnosis."
+    disclaimer: str = "Research prototype only. Not for clinical diagnosis."
 
 class ReportRequest(BaseModel):
     patient_data: Dict[str, Any]
     predictions: PredictionResponse
-    disclaimer: str = "DISCLAIMER: AI decision support prototype. Not for clinical diagnosis."
+    disclaimer: str = "Research prototype only. Not for clinical diagnosis."
 
 class ReportResponse(BaseModel):
     report_id: str

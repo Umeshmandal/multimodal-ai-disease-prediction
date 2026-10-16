@@ -3,7 +3,7 @@ import axios from 'axios';
 // VITE_API_URL may be a host (Docker/local development) or an API path
 // (Vercel/Render). Normalize both forms to the same /api contract.
 const configuredApiUrl = import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? 'http://localhost:8000' : '/api');
+  (import.meta.env.DEV ? '/api' : '/api');
 const API_BASE_URL = configuredApiUrl.replace(/\/$/, '').endsWith('/api')
   ? configuredApiUrl.replace(/\/$/, '')
   : `${configuredApiUrl.replace(/\/$/, '')}/api`;
@@ -30,6 +30,19 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      if (window.location.pathname !== '/login') {
+        window.location.assign('/login');
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Auth Service
 export const authService = {
@@ -98,6 +111,19 @@ export const reportService = {
   getReport: async (reportId) => {
     const response = await api.get(`/reports/${reportId}`);
     return response.data;
+  },
+  listReports: async () => {
+    const response = await api.get('/reports/');
+    return response.data;
+  },
+  downloadPdf: async (reportId) => {
+    const response = await api.get(`/reports/${reportId}/pdf`, { responseType: 'blob' });
+    const url = URL.createObjectURL(response.data);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `clinical_report_${reportId}.pdf`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   },
 };
 

@@ -32,3 +32,11 @@ Thumbs.db
 backend/.env
 venv/
 __pycache__/
+
+# Generated clinical reports
+ generated_reports/
+*.pdf
+
+# Generated clinical reports
+ generated_reports/
+*.pdf

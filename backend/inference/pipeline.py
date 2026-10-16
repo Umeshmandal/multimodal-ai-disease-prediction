@@ -45,10 +45,7 @@ class MasterInferencePipeline:
         txt_preds, txt_emb = self.text_pipe.predict(symptom_text)
         
         logger.info("Processing History Modality...")
-        hist_emb = self.history_pipe.get_embedding(patient_data)
-        # Note: History model doesn't strictly need to return individual preds for the final API, 
-        # but we can add it if needed. For now, we just use its embedding.
-        hist_preds = {} # Placeholder if needed
+        hist_preds, hist_emb = self.history_pipe.predict(patient_data)
         
         # 2. Multimodal Fusion & Final Prediction
         logger.info("Running Multimodal Fusion...")

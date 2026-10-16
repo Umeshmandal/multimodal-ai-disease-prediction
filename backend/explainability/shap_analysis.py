@@ -138,11 +138,19 @@ def generate_shap_explanation(model, image_tensor: torch.Tensor, background_imag
 
 
 class HistorySHAPExplainer:
-    """Legacy compatibility wrapper for tabular SHAP explainability."""
+    """SHAP-style tabular attributions for the active history encoder."""
 
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
 
-    def explain_instance(self, *args, **kwargs):
-        raise NotImplementedError("This project now uses image SHAP via generate_shap_explanation().")
+    def explain_instance(self, features, target_class_idx):
+        model = self.args[0]
+        device = self.kwargs.get("device", torch.device("cpu"))
+        tensor = torch.tensor(features, dtype=torch.float32, device=device).unsqueeze(0).requires_grad_(True)
+        model.zero_grad(set_to_none=True)
+        score = model(tensor)["logits"][0, int(target_class_idx)]
+        score.backward()
+        values = (tensor.grad[0] * tensor[0]).detach().cpu().numpy()
+        names = self.kwargs.get("feature_names", [f"feature_{i}" for i in range(len(values))])
+        return {name: float(value) for name, value in zip(names, values)}
